@@ -7,25 +7,47 @@ class LandingPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Welcome'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/login');
-              },
-              child: Text('Login'),
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    child: Text('Login'),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/signup');
+                    },
+                    child: Text('Signup'),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Implement the navigation to the Government Verified ID signup page
+                    },
+                    child: Text('Signup with Govt. Verified ID'),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30.0), // Optional padding
+            child: ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/signup');
+                Navigator.pushNamed(context, '/dashboard');
               },
-              child: Text('Signup'),
+              child: Text('Go to Dashboard'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
