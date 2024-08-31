@@ -7,34 +7,32 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  bool isLocationEnabled = false;
-  bool isMicrophoneEnabled = false;
+  bool _isLocationEnabled = false;
+  bool _isMicrophoneEnabled = false;
 
-  Future<void> requestLocationPermission() async {
+  Future<void> _requestLocationPermission() async {
     PermissionStatus status = await Permission.location.request();
     if (status.isGranted) {
       setState(() {
-        isLocationEnabled = true;
+        _isLocationEnabled = true;
       });
     } else {
       setState(() {
-        isLocationEnabled = false;
+        _isLocationEnabled = false;
       });
-      // Handle permission denial
     }
   }
 
-  Future<void> requestMicrophonePermission() async {
+  Future<void> _requestMicrophonePermission() async {
     PermissionStatus status = await Permission.microphone.request();
     if (status.isGranted) {
       setState(() {
-        isMicrophoneEnabled = true;
+        _isMicrophoneEnabled = true;
       });
     } else {
       setState(() {
-        isMicrophoneEnabled = false;
+        _isMicrophoneEnabled = false;
       });
-      // Handle permission denial
     }
   }
 
@@ -44,78 +42,62 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: AppBar(
         title: Text('Dashboard'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  children: [
-                    Text('Location Access'),
-                    Switch(
-                      value: isLocationEnabled,
-                      onChanged: (value) {
-                        if (value) {
-                          requestLocationPermission();
-                        } else {
-                          setState(() {
-                            isLocationEnabled = false;
-                          });
-                        }
-                      },
-                    ),
-                  ],
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SwitchListTile(
+            title: Text('Enable Location'),
+            value: _isLocationEnabled,
+            onChanged: (bool value) async {
+              if (!_isLocationEnabled) {
+                await _requestLocationPermission();
+              } else {
+                setState(() {
+                  _isLocationEnabled = value;
+                });
+              }
+            },
+          ),
+          SwitchListTile(
+            title: Text('Enable Microphone'),
+            value: _isMicrophoneEnabled,
+            onChanged: (bool value) async {
+              if (!_isMicrophoneEnabled) {
+                await _requestMicrophonePermission();
+              } else {
+                setState(() {
+                  _isMicrophoneEnabled = value;
+                });
+              }
+            },
+          ),
+          SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  // Implement SOS action
+                },
+                child: Text('SOS'),
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(100, 100),
+                  shape: RoundedRectangleBorder(),
                 ),
-                Column(
-                  children: [
-                    Text('Microphone Access'),
-                    Switch(
-                      value: isMicrophoneEnabled,
-                      onChanged: (value) {
-                        if (value) {
-                          requestMicrophonePermission();
-                        } else {
-                          setState(() {
-                            isMicrophoneEnabled = false;
-                          });
-                        }
-                      },
-                    ),
-                  ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Implement Trigger Alert action
+                },
+                child: Text('Trigger Alert'),
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(100, 100),
+                  shape: RoundedRectangleBorder(),
                 ),
-              ],
-            ),
-            SizedBox(height: 50),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement SOS functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(),
-                    minimumSize: Size(100, 100),
-                  ),
-                  child: Text('SOS'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement trigger alert functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(),
-                    minimumSize: Size(100, 100),
-                  ),
-                  child: Text('Trigger Alert'),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
