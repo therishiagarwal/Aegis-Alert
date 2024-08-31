@@ -9,6 +9,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   bool _isLocationEnabled = false;
   bool _isMicrophoneEnabled = false;
+  bool _isSOSEnabled = false;
 
   Future<void> _requestLocationPermission() async {
     PermissionStatus status = await Permission.location.request();
@@ -32,6 +33,21 @@ class _DashboardPageState extends State<DashboardPage> {
     } else {
       setState(() {
         _isMicrophoneEnabled = false;
+      });
+    }
+  }
+
+  Future<void> _requestSOSPermission() async {
+    // Assuming there's a specific permission for SOS, but you may need to handle this manually
+    // with custom logic as SOS might not be a standard permission in the PermissionHandler package.
+    PermissionStatus status = await Permission.phone.request(); // Example: Using phone permission
+    if (status.isGranted) {
+      setState(() {
+        _isSOSEnabled = true;
+      });
+    } else {
+      setState(() {
+        _isSOSEnabled = false;
       });
     }
   }
@@ -67,6 +83,19 @@ class _DashboardPageState extends State<DashboardPage> {
               } else {
                 setState(() {
                   _isMicrophoneEnabled = value;
+                });
+              }
+            },
+          ),
+          SwitchListTile(
+            title: Text('Enable SOS'),
+            value: _isSOSEnabled,
+            onChanged: (bool value) async {
+              if (!_isSOSEnabled) {
+                await _requestSOSPermission();
+              } else {
+                setState(() {
+                  _isSOSEnabled = value;
                 });
               }
             },
