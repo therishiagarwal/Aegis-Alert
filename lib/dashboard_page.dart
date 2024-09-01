@@ -39,10 +39,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _requestSOSPermission() async {
-    // Request phone permission as an example, assuming it's necessary for the SOS feature.
+    // Request necessary permissions for SOS feature
     PermissionStatus phoneStatus = await Permission.phone.request();
-    PermissionStatus locationStatus = await Permission.location.request();
-    PermissionStatus smsStatus = await Permission.sms.request(); // Example: Requesting SMS permission for sending SOS messages.
+    PermissionStatus locationStatus = await Permission.locationAlways.request(); // Request for "Allow all the time"
+    PermissionStatus smsStatus = await Permission.sms.request(); // Example: Requesting SMS permission
 
     if (phoneStatus.isGranted && locationStatus.isGranted && smsStatus.isGranted) {
       setState(() {
