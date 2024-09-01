@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shake/shake.dart'; // Import the shake package
+import 'package:geolocator/geolocator.dart'; // Import for location
+import 'package:url_launcher/url_launcher.dart'; // Import for making calls
+// import 'package:sms/sms.dart'; // Import for SMS functionality
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -20,7 +23,8 @@ class _DashboardPageState extends State<DashboardPage> {
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: _handleShake,
       shakeThresholdGravity: 9, // Adjust this value as needed for sensitivity
-    );  }
+    );
+  }
 
   @override
   void dispose() {
@@ -87,7 +91,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // Handle shake gesture
   void _handleShake() {
     if (_isSOSEnabled) {
       // Trigger SOS action
@@ -95,11 +98,33 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  // Example SOS action
-  void _triggerSOS() {
-    // Implement SOS action here
-    // You can send an SMS, make a call, or any other SOS action you intend to perform
-    print("SOS Triggered!");
+  Future<void> _triggerSOS() async {
+    // Define your emergency contacts and phone numbers
+    const emergencyContacts = ['6377130249']; // Replace with actual numbers
+    const emergencyNumber = '6377130249'; // Replace with actual emergency number if needed
+
+    // Get current location
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    String locationMessage = 'I need help! My current location is: https://maps.google.com/?q=${position.latitude},${position.longitude}';
+
+    // Send an SOS SMS
+    // SmsSender sender = SmsSender();
+    // for (var contact in emergencyContacts) {
+    //   sender.sendSms(SmsMessage(contact, locationMessage));
+    // }
+
+    // Make an emergency call
+    // final Uri phoneUri = Uri(scheme: 'tel', path: emergencyNumber);
+    final Uri phoneUri = Uri(scheme: 'tel', path: '6377130249');
+
+    // if (await canLaunch(phoneUri.toString())) {
+    //   await launch(phoneUri.toString());
+    // } else {
+    //   // print('Could not launch $phoneUri');
+    // }
+
+    // Notify the user
+    print('SOS Triggered!');
   }
 
   @override

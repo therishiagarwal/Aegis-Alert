@@ -39,6 +39,9 @@ dependencies:
   firebase_auth: ^5.2.0
   permission_handler: ^10.2.0
   shake: ^2.2.0
+  geolocator: ^8.0.0
+  url_launcher: ^6.0.0
+#  sms: ^2.0.0
 
 
 
