@@ -1,6 +1,6 @@
-// dasboard_page.dart
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shake/shake.dart'; // Import the shake package
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -11,6 +11,22 @@ class _DashboardPageState extends State<DashboardPage> {
   bool _isLocationEnabled = false;
   bool _isMicrophoneEnabled = false;
   bool _isSOSEnabled = false;
+  ShakeDetector? _shakeDetector;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the shake detector with custom sensitivity
+    _shakeDetector = ShakeDetector.autoStart(
+      onPhoneShake: _handleShake,
+      shakeThresholdGravity: 9, // Adjust this value as needed for sensitivity
+    );  }
+
+  @override
+  void dispose() {
+    _shakeDetector?.stopListening();
+    super.dispose();
+  }
 
   Future<void> _requestLocationPermission() async {
     PermissionStatus status = await Permission.location.request();
@@ -39,17 +55,15 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _requestSOSPermission() async {
-    // Request necessary permissions for SOS feature
     PermissionStatus phoneStatus = await Permission.phone.request();
-    PermissionStatus locationStatus = await Permission.locationAlways.request(); // Request for "Allow all the time"
-    PermissionStatus smsStatus = await Permission.sms.request(); // Example: Requesting SMS permission
+    PermissionStatus locationStatus = await Permission.locationAlways.request();
+    PermissionStatus smsStatus = await Permission.sms.request();
 
     if (phoneStatus.isGranted && locationStatus.isGranted && smsStatus.isGranted) {
       setState(() {
         _isSOSEnabled = true;
       });
     } else {
-      // If any permission is denied, set SOS as disabled and show a dialog or notification.
       setState(() {
         _isSOSEnabled = false;
       });
@@ -73,6 +87,20 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  // Handle shake gesture
+  void _handleShake() {
+    if (_isSOSEnabled) {
+      // Trigger SOS action
+      _triggerSOS();
+    }
+  }
+
+  // Example SOS action
+  void _triggerSOS() {
+    // Implement SOS action here
+    // You can send an SMS, make a call, or any other SOS action you intend to perform
+    print("SOS Triggered!");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +156,7 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  // Implement SOS action
+                  _triggerSOS(); // Manually trigger SOS action
                 },
                 child: Text('SOS'),
                 style: ElevatedButton.styleFrom(
