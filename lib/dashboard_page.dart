@@ -39,19 +39,40 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _requestSOSPermission() async {
-    // Assuming there's a specific permission for SOS, but you may need to handle this manually
-    // with custom logic as SOS might not be a standard permission in the PermissionHandler package.
-    PermissionStatus status = await Permission.phone.request(); // Example: Using phone permission
-    if (status.isGranted) {
+    // Request phone permission as an example, assuming it's necessary for the SOS feature.
+    PermissionStatus phoneStatus = await Permission.phone.request();
+    PermissionStatus locationStatus = await Permission.location.request();
+    PermissionStatus smsStatus = await Permission.sms.request(); // Example: Requesting SMS permission for sending SOS messages.
+
+    if (phoneStatus.isGranted && locationStatus.isGranted && smsStatus.isGranted) {
       setState(() {
         _isSOSEnabled = true;
       });
     } else {
+      // If any permission is denied, set SOS as disabled and show a dialog or notification.
       setState(() {
         _isSOSEnabled = false;
       });
+      _showPermissionDeniedDialog();
     }
   }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Permission Required'),
+        content: Text('To enable SOS, all required permissions (Phone, Location, SMS) must be granted.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
