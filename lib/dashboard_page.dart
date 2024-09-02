@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shake/shake.dart'; // Import the shake package
 import 'package:geolocator/geolocator.dart'; // Import for location
-import 'package:url_launcher/url_launcher.dart'; // Import for making calls
-// import 'package:sms/sms.dart'; // Import for SMS functionality
+import 'package:flutter/services.dart'; // Import for method channel
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -11,6 +10,8 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  static const platform = MethodChannel('com.example.sos/trigger');
+
   bool _isLocationEnabled = false;
   bool _isMicrophoneEnabled = false;
   bool _isSOSEnabled = false;
@@ -98,33 +99,51 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _triggerNativeSOS() async {
+    try {
+      await platform.invokeMethod('triggerSOS');
+    } on PlatformException catch (e) {
+      print("Failed to trigger SOS: '${e.message}'.");
+    }
+  }
+
   Future<void> _triggerSOS() async {
     // Define your emergency contacts and phone numbers
-    const emergencyContacts = ['6377130249']; // Replace with actual numbers
-    const emergencyNumber = '6377130249'; // Replace with actual emergency number if needed
+    const emergencyContacts = ['+91 83196 81297']; // Replace with actual numbers
+    const emergencyNumber = '+91 83196 81297'; // Replace with actual emergency number if needed
 
     // Get current location
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     String locationMessage = 'I need help! My current location is: https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
-    // Send an SOS SMS
+    // Send an SOS SMS (commented out as you requested, or you can add your logic)
     // SmsSender sender = SmsSender();
     // for (var contact in emergencyContacts) {
     //   sender.sendSms(SmsMessage(contact, locationMessage));
     // }
 
-    // Make an emergency call
-    // final Uri phoneUri = Uri(scheme: 'tel', path: emergencyNumber);
-    final Uri phoneUri = Uri(scheme: 'tel', path: '6377130249');
-
-    // if (await canLaunch(phoneUri.toString())) {
-    //   await launch(phoneUri.toString());
-    // } else {
-    //   // print('Could not launch $phoneUri');
-    // }
+    // Trigger native SOS action by making an emergency call
+    await _triggerNativeSOS();
 
     // Notify the user
     print('SOS Triggered!');
+  }
+
+  Future<void> _handleTriggerAlert() async {
+    if (_isSOSEnabled) {
+      // Trigger SOS action
+      await _triggerSOS();
+
+      // Print messages
+      print('Alert Triggered!');
+      print('SOS Triggered!');
+      print('Location sent to the emergency contacts');
+
+      // Implement your audio alert functionality here
+      // For example, you can play a sound using an audio plugin
+    } else {
+      print('SOS is not enabled. Please enable SOS first.');
+    }
   }
 
   @override
@@ -163,7 +182,7 @@ class _DashboardPageState extends State<DashboardPage> {
             },
           ),
           SwitchListTile(
-            title: Text('Enable SOS'),
+            title: Text('Enable Emergency SOS'),
             value: _isSOSEnabled,
             onChanged: (bool value) async {
               if (!_isSOSEnabled) {
@@ -191,7 +210,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Implement Trigger Alert action
+                  _handleTriggerAlert(); // Handle Trigger Alert button press
                 },
                 child: Text('Trigger Alert'),
                 style: ElevatedButton.styleFrom(
