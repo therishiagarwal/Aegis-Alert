@@ -4,6 +4,7 @@ import 'package:shake/shake.dart'; // Import the shake package
 import 'package:geolocator/geolocator.dart'; // Import for location
 import 'package:flutter/services.dart'; // Import for method channel
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart'; // Import for direct calling
+import 'package:background_sms/background_sms.dart'; // Import for background SMS
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -117,10 +118,20 @@ class _DashboardPageState extends State<DashboardPage> {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     String locationMessage = 'I need help! My current location is: https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
-    // Trigger native SOS action by making an emergency call
-    await _triggerNativeSOS();
+    // Send SOS message via SMS to each emergency contact
+    for (String contact in emergencyContacts) {
+      SmsStatus status = await BackgroundSms.sendMessage(
+        phoneNumber: contact,
+        message: 'I am in trouble. $locationMessage',
+      );
+      if (status == SmsStatus.sent) {
+        print('SOS message sent to $contact');
+      } else {
+        print('Failed to send SOS message to $contact');
+      }
+    }
 
-    // Directly call the emergency number
+    // Trigger native SOS action by making an emergency call
     await FlutterPhoneDirectCaller.callNumber(emergencyNumber);
 
     // Notify the user
