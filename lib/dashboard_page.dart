@@ -5,6 +5,9 @@ import 'package:geolocator/geolocator.dart'; // Import for location
 import 'package:flutter/services.dart'; // Import for method channel
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart'; // Import for direct calling
 import 'package:background_sms/background_sms.dart'; // Import for background SMS
+import 'package:contacts_service/contacts_service.dart'; // Import for contact service
+import 'package:first_app/landing_page.dart';
+
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -18,6 +21,7 @@ class _DashboardPageState extends State<DashboardPage> {
   bool _isMicrophoneEnabled = false;
   bool _isSOSEnabled = false;
   ShakeDetector? _shakeDetector;
+  Contact? _selectedContact;
 
   @override
   void initState() {
@@ -25,7 +29,7 @@ class _DashboardPageState extends State<DashboardPage> {
     // Initialize the shake detector with custom sensitivity
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: _handleShake,
-      shakeThresholdGravity: 9, // Adjust this value as needed for sensitivity
+      shakeThresholdGravity: 8, // Adjust this value as needed for sensitivity
     );
   }
 
@@ -111,23 +115,30 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> _triggerSOS() async {
     // Define your emergency contacts and phone numbers
-    const emergencyContacts = ['+91 83196 81297']; // Replace with actual numbers
     const emergencyNumber = '+91 83196 81297'; // Replace with actual emergency number if needed
 
     // Get current location
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     String locationMessage = 'I need help! My current location is: https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
-    // Send SOS message via SMS to each emergency contact
-    for (String contact in emergencyContacts) {
-      SmsStatus status = await BackgroundSms.sendMessage(
-        phoneNumber: contact,
-        message: 'I am in trouble. $locationMessage',
-      );
-      if (status == SmsStatus.sent) {
-        print('SOS message sent to $contact');
+    // Send SOS message via SMS to the selected emergency contact
+    if (_selectedContact != null) {
+      String? phoneNumber = _selectedContact?.phones?.isNotEmpty == true
+          ? _selectedContact?.phones?.first.value
+          : null;
+
+      if (phoneNumber != null) {
+        SmsStatus status = await BackgroundSms.sendMessage(
+          phoneNumber: phoneNumber,
+          message: 'I am in trouble. $locationMessage',
+        );
+        if (status == SmsStatus.sent) {
+          print('SOS message sent to $phoneNumber');
+        } else {
+          print('Failed to send SOS message to $phoneNumber');
+        }
       } else {
-        print('Failed to send SOS message to $contact');
+        print('Selected contact has no phone number.');
       }
     }
 
@@ -155,17 +166,87 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _pickContact() async {
+    PermissionStatus permission = await Permission.contacts.request();
+
+    if (permission.isGranted) {
+      List<Contact> contacts = await ContactsService.getContacts();
+      Contact? contact = await showDialog<Contact>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Select Contact'),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: contacts.length,
+              itemBuilder: (context, index) {
+                Contact contact = contacts[index];
+                return ListTile(
+                  title: Text(contact.displayName ?? ''),
+                  onTap: () {
+                    Navigator.of(context).pop(contact);
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      if (contact != null) {
+        setState(() {
+          _selectedContact = contact;
+        });
+
+        // Store the selected contact's phone number for SOS
+        String? phoneNumber = contact.phones?.isNotEmpty == true
+            ? contact.phones!.first.value
+            : null;
+
+        if (phoneNumber != null) {
+          print("Selected contact number: $phoneNumber");
+          // Store or use the phone number as needed
+        } else {
+          print("Selected contact has no phone number.");
+        }
+      }
+    } else {
+      // Handle permission denied
+      print("Contacts permission denied.");
+    }
+  }
+
+  void _logout() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LandingPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            _pickContact(); // Open contact picker
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: _logout, // Call the logout function when pressed
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SwitchListTile(
-            title: Text('Enable Location'),
+            title: Text('Enable Location Track'),
             value: _isLocationEnabled,
             onChanged: (bool value) async {
               if (!_isLocationEnabled) {
@@ -173,12 +254,12 @@ class _DashboardPageState extends State<DashboardPage> {
               } else {
                 setState(() {
                   _isLocationEnabled = value;
-                });
+                }); // Remove the semicolon here
               }
             },
           ),
           SwitchListTile(
-            title: Text('Enable Microphone'),
+            title: Text('Enable Microphone Track'),
             value: _isMicrophoneEnabled,
             onChanged: (bool value) async {
               if (!_isMicrophoneEnabled) {
@@ -186,7 +267,7 @@ class _DashboardPageState extends State<DashboardPage> {
               } else {
                 setState(() {
                   _isMicrophoneEnabled = value;
-                });
+                }); // Remove the semicolon here
               }
             },
           ),
@@ -199,7 +280,7 @@ class _DashboardPageState extends State<DashboardPage> {
               } else {
                 setState(() {
                   _isSOSEnabled = value;
-                });
+                }); // Remove the semicolon here
               }
             },
           ),
@@ -211,10 +292,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 onPressed: () {
                   _triggerSOS(); // Manually trigger SOS action
                 },
-                child: Text('SOS'),
+                child: Text('Trigger SOS'),
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(100, 100),
-                  shape: RoundedRectangleBorder(),
+                  fixedSize: Size(150, 100),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
               ),
               ElevatedButton(
@@ -223,8 +304,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 },
                 child: Text('Trigger Alert'),
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(100, 100),
-                  shape: RoundedRectangleBorder(),
+                  fixedSize: Size(150, 100),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
               ),
             ],
