@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shake/shake.dart'; // Import the shake package
-import 'package:geolocator/geolocator.dart'; // Import for location
-import 'package:flutter/services.dart'; // Import for method channel
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart'; // Import for direct calling
-import 'package:background_sms/background_sms.dart'; // Import for background SMS
-import 'package:contacts_service/contacts_service.dart'; // Import for contact service
+import 'package:shake/shake.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:background_sms/background_sms.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:first_app/landing_page.dart';
-
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -28,10 +27,9 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize the shake detector with custom sensitivity
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: _handleShake,
-      shakeThresholdGravity: 8, // Adjust this value as needed for sensitivity
+      shakeThresholdGravity: 8,
     );
   }
 
@@ -102,7 +100,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _handleShake() {
     if (_isSOSEnabled) {
-      // Trigger SOS action
       _triggerSOS();
     }
   }
@@ -116,14 +113,11 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _triggerSOS() async {
-    // Define your emergency contacts and phone numbers
-    const emergencyNumber = '+91 83196 81297'; // Replace with actual emergency number if needed
+    const emergencyNumber = '+91 83196 81297';
 
-    // Get current location
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     String locationMessage = 'I need help! My current location is: https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
-    // Send SOS message via SMS to the selected emergency contact
     if (_selectedContact != null) {
       String? phoneNumber = _selectedContact?.phones?.isNotEmpty == true
           ? _selectedContact?.phones?.first.value
@@ -144,25 +138,16 @@ class _DashboardPageState extends State<DashboardPage> {
       }
     }
 
-    // Trigger native SOS action by making an emergency call
     await FlutterPhoneDirectCaller.callNumber(emergencyNumber);
-
-    // Notify the user
     print('SOS Triggered!');
   }
 
   Future<void> _handleTriggerAlert() async {
     if (_isSOSEnabled) {
-      // Trigger SOS action
       await _triggerSOS();
-
-      // Print messages
       print('Alert Triggered!');
       print('SOS Triggered!');
       print('Location sent to the emergency contacts');
-
-      // Implement your audio alert functionality here
-      // For example, you can play a sound using an audio plugin
     } else {
       print('SOS is not enabled. Please enable SOS first.');
     }
@@ -201,20 +186,17 @@ class _DashboardPageState extends State<DashboardPage> {
           _selectedContact = contact;
         });
 
-        // Store the selected contact's phone number for SOS
         String? phoneNumber = contact.phones?.isNotEmpty == true
             ? contact.phones!.first.value
             : null;
 
         if (phoneNumber != null) {
           print("Selected contact number: $phoneNumber");
-          // Store or use the phone number as needed
         } else {
           print("Selected contact has no phone number.");
         }
       }
     } else {
-      // Handle permission denied
       print("Contacts permission denied.");
     }
   }
@@ -231,18 +213,52 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            _pickContact(); // Open contact picker
-          },
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              Scaffold.of(context).openDrawer(); // Open the drawer when hamburger menu is clicked
+            },
+          ),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: _logout, // Call the logout function when pressed
+            onPressed: _logout,
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.contacts),
+              title: const Text('Manage Emergency Contacts'),
+              onTap: () {
+                _pickContact(); // Open contact picker
+                Navigator.of(context).pop(); // Close the drawer after selecting
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: _logout, // Log out when this option is selected
+            ),
+          ],
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -251,12 +267,12 @@ class _DashboardPageState extends State<DashboardPage> {
             title: const Text('Enable Location Track'),
             value: _isLocationEnabled,
             onChanged: (bool value) async {
-              if (!_isLocationEnabled) {
-                await _requestLocationPermission();
-              } else {
+              if (!value) {
                 setState(() {
                   _isLocationEnabled = value;
-                }); // Remove the semicolon here
+                });
+              } else {
+                await _requestLocationPermission();
               }
             },
           ),
@@ -264,12 +280,12 @@ class _DashboardPageState extends State<DashboardPage> {
             title: const Text('Enable Microphone Track'),
             value: _isMicrophoneEnabled,
             onChanged: (bool value) async {
-              if (!_isMicrophoneEnabled) {
-                await _requestMicrophonePermission();
-              } else {
+              if (!value) {
                 setState(() {
                   _isMicrophoneEnabled = value;
-                }); // Remove the semicolon here
+                });
+              } else {
+                await _requestMicrophonePermission();
               }
             },
           ),
@@ -277,12 +293,12 @@ class _DashboardPageState extends State<DashboardPage> {
             title: const Text('Enable Emergency SOS'),
             value: _isSOSEnabled,
             onChanged: (bool value) async {
-              if (!_isSOSEnabled) {
-                await _requestSOSPermission();
-              } else {
+              if (!value) {
                 setState(() {
                   _isSOSEnabled = value;
-                }); // Remove the semicolon here
+                });
+              } else {
+                await _requestSOSPermission();
               }
             },
           ),
@@ -292,7 +308,7 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  _triggerSOS(); // Manually trigger SOS action
+                  _handleTriggerAlert();
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: const Size(150, 100),
@@ -302,7 +318,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _handleTriggerAlert(); // Handle Trigger Alert button press
+                  _handleTriggerAlert();
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: const Size(150, 100),
