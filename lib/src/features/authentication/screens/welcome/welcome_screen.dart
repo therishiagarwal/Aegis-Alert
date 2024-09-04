@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../constants/text_strinigs.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,12 +12,12 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
               children: [
                 // Image(image: AssetImage(),)
-                Text(tWelcomeTitle),
-                Text(tWelcomeSubTitle),
+                const Text(tWelcomeTitle),
+                const Text(tWelcomeSubTitle),
                 Row(
                   children: [
-                    OutlinedButton(onPressed: (){}, child: Text(tLogin)),
-                    ElevatedButton(onPressed: (){}, child: Text(tSignup)),
+                    OutlinedButton(onPressed: (){}, child: const Text(tLogin)),
+                    ElevatedButton(onPressed: (){}, child: const Text(tSignup)),
                   ],
                 )
               ]

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -59,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
   void navigateToDashboard() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => DashboardPage()),
+      MaterialPageRoute(builder: (context) => const DashboardPage()),
     );
   }
 
@@ -67,12 +69,12 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Error'),
+        title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -91,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -100,10 +102,10 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             TextField(
               controller: phoneController,
-              decoration: InputDecoration(labelText: 'Phone Number'),
+              decoration: const InputDecoration(labelText: 'Phone Number'),
               keyboardType: TextInputType.phone,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 String phoneNumber = phoneController.text.trim();
@@ -113,15 +115,15 @@ class _LoginPageState extends State<LoginPage> {
                   showError('Please enter a valid 10-digit phone number.');
                 }
               },
-              child: Text('Send OTP'),
+              child: const Text('Send OTP'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               controller: otpController,
-              decoration: InputDecoration(labelText: 'Enter OTP'),
+              decoration: const InputDecoration(labelText: 'Enter OTP'),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 String otp = otpController.text.trim();
@@ -131,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                   showError('Please enter a valid 6-digit OTP.');
                 }
               },
-              child: Text('Verify OTP'),
+              child: const Text('Verify OTP'),
             ),
           ],
         ),

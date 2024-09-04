@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 
 class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
+
   @override
   _SignupPageState createState() => _SignupPageState();
 }
@@ -11,17 +12,17 @@ class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   String? _selectedGender;
   DateTime? _selectedDate;
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _otpController = TextEditingController();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
   bool _isOTPSent = false;
 
   // Method to send OTP
   void _getOTP() {
     if (_phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter your phone number')),
+        const SnackBar(content: Text('Please enter your phone number')),
       );
     } else {
       // Simulate OTP sending process
@@ -43,10 +44,11 @@ class _SignupPageState extends State<SignupPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null && picked != _selectedDate)
+    if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
       });
+    }
   }
 
   // Dummy method to simulate OTP verification
@@ -54,11 +56,11 @@ class _SignupPageState extends State<SignupPage> {
     // Add your OTP verification logic here
     if (_otpController.text == "123456") { // Replace with actual verification
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('OTP Verified!')),
+        const SnackBar(content: Text('OTP Verified!')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid OTP!')),
+        const SnackBar(content: Text('Invalid OTP!')),
       );
     }
   }
@@ -67,7 +69,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Signup'),
+        title: const Text('Signup'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -77,7 +79,7 @@ class _SignupPageState extends State<SignupPage> {
             children: [
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone Number'),
+                decoration: const InputDecoration(labelText: 'Phone Number'),
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -86,16 +88,16 @@ class _SignupPageState extends State<SignupPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _getOTP,
-                child: Text('Get OTP'),
+                child: const Text('Get OTP'),
               ),
               if (_isOTPSent) ...[
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _otpController,
-                  decoration: InputDecoration(labelText: 'OTP'),
+                  decoration: const InputDecoration(labelText: 'OTP'),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -104,16 +106,16 @@ class _SignupPageState extends State<SignupPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _verifyOTP,
-                  child: Text('Verify OTP'),
+                  child: const Text('Verify OTP'),
                 ),
               ],
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(labelText: 'Name'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your name';
@@ -121,16 +123,16 @@ class _SignupPageState extends State<SignupPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _selectedGender,
                 items: ['Male', 'Female', 'Other']
                     .map((label) => DropdownMenuItem(
-                  child: Text(label),
                   value: label,
+                  child: Text(label),
                 ))
                     .toList(),
-                hint: Text('Gender'),
+                hint: const Text('Gender'),
                 onChanged: (value) {
                   setState(() {
                     _selectedGender = value;
@@ -143,13 +145,13 @@ class _SignupPageState extends State<SignupPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Date of Birth',
                   suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
+                    icon: const Icon(Icons.calendar_today),
                     onPressed: () => _selectDate(context),
                   ),
                 ),
@@ -165,10 +167,10 @@ class _SignupPageState extends State<SignupPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _addressController,
-                decoration: InputDecoration(labelText: 'Address'),
+                decoration: const InputDecoration(labelText: 'Address'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your address';
@@ -176,17 +178,17 @@ class _SignupPageState extends State<SignupPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     // Process the data
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Processing Data')),
+                      const SnackBar(content: Text('Processing Data')),
                     );
                   }
                 },
-                child: Text('Submit'),
+                child: const Text('Submit'),
               ),
             ],
           ),

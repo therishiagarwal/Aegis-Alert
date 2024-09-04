@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class LandingPage extends StatelessWidget {
+  const LandingPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome'),
+        title: const Text('Welcome'),
       ),
       body: Column(
         children: [
@@ -18,21 +20,21 @@ class LandingPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushNamed(context, '/login');
                     },
-                    child: Text('Login'),
+                    child: const Text('Login'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/signup');
                     },
-                    child: Text('Signup'),
+                    child: const Text('Signup'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       // Implement the navigation to the Government Verified ID signup page
                     },
-                    child: Text('Signup with Govt. Verified ID'),
+                    child: const Text('Signup with Govt. Verified ID'),
                   ),
                 ],
               ),
@@ -44,7 +46,7 @@ class LandingPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, '/dashboard');
               },
-              child: Text('Go to Dashboard'),
+              child: const Text('Go to Dashboard'),
             ),
           ),
         ],

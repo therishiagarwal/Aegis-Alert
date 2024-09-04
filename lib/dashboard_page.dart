@@ -10,6 +10,8 @@ import 'package:first_app/landing_page.dart';
 
 
 class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
+
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }
@@ -86,12 +88,12 @@ class _DashboardPageState extends State<DashboardPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Permission Required'),
-        content: Text('To enable SOS, all required permissions (Phone, Location, SMS) must be granted.'),
+        title: const Text('Permission Required'),
+        content: const Text('To enable SOS, all required permissions (Phone, Location, SMS) must be granted.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -174,8 +176,8 @@ class _DashboardPageState extends State<DashboardPage> {
       Contact? contact = await showDialog<Contact>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Select Contact'),
-          content: Container(
+          title: const Text('Select Contact'),
+          content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
@@ -220,7 +222,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void _logout() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LandingPage()),
+      MaterialPageRoute(builder: (context) => const LandingPage()),
     );
   }
 
@@ -228,16 +230,16 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dashboard'),
+        title: const Text('Dashboard'),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: const Icon(Icons.menu),
           onPressed: () {
             _pickContact(); // Open contact picker
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: _logout, // Call the logout function when pressed
           ),
         ],
@@ -246,7 +248,7 @@ class _DashboardPageState extends State<DashboardPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SwitchListTile(
-            title: Text('Enable Location Track'),
+            title: const Text('Enable Location Track'),
             value: _isLocationEnabled,
             onChanged: (bool value) async {
               if (!_isLocationEnabled) {
@@ -259,7 +261,7 @@ class _DashboardPageState extends State<DashboardPage> {
             },
           ),
           SwitchListTile(
-            title: Text('Enable Microphone Track'),
+            title: const Text('Enable Microphone Track'),
             value: _isMicrophoneEnabled,
             onChanged: (bool value) async {
               if (!_isMicrophoneEnabled) {
@@ -272,7 +274,7 @@ class _DashboardPageState extends State<DashboardPage> {
             },
           ),
           SwitchListTile(
-            title: Text('Enable Emergency SOS'),
+            title: const Text('Enable Emergency SOS'),
             value: _isSOSEnabled,
             onChanged: (bool value) async {
               if (!_isSOSEnabled) {
@@ -284,7 +286,7 @@ class _DashboardPageState extends State<DashboardPage> {
               }
             },
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -292,21 +294,21 @@ class _DashboardPageState extends State<DashboardPage> {
                 onPressed: () {
                   _triggerSOS(); // Manually trigger SOS action
                 },
-                child: Text('Trigger SOS'),
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(150, 100),
+                  fixedSize: const Size(150, 100),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
+                child: const Text('Trigger SOS'),
               ),
               ElevatedButton(
                 onPressed: () {
                   _handleTriggerAlert(); // Handle Trigger Alert button press
                 },
-                child: Text('Trigger Alert'),
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(150, 100),
+                  fixedSize: const Size(150, 100),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
+                child: const Text('Trigger Alert'),
               ),
             ],
           ),
