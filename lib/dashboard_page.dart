@@ -134,34 +134,53 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _triggerSOS() async {
-    const emergencyNumber = '+91 83196 81297';
+    const emergencyNumber = '+91 83196 81297';  // Replace with your emergency number
 
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    String locationMessage = 'I need help! My current location is: https://maps.google.com/?q=${position.latitude},${position.longitude}';
+    try {
+      // Get current location
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      String locationMessage = 'I need help! My current location is: https://maps.google.com/?q=${position.latitude},${position.longitude}';
 
-    if (_selectedContact != null) {
-      String? phoneNumber = _selectedContact?.phones?.isNotEmpty == true
-          ? _selectedContact?.phones?.first.value
-          : null;
+      // Check if a contact has been selected
+      if (_selectedContact != null) {
+        String? phoneNumber = _selectedContact?.phones?.isNotEmpty == true
+            ? _selectedContact?.phones?.first.value
+            : null;
 
-      if (phoneNumber != null) {
+        if (phoneNumber != null) {
+          SmsStatus status = await BackgroundSms.sendMessage(
+            phoneNumber: phoneNumber,
+            message: 'I am in trouble. $locationMessage',
+          );
+          if (status == SmsStatus.sent) {
+            print('SOS message sent to $phoneNumber');
+          } else {
+            print('Failed to send SOS message to $phoneNumber');
+          }
+        } else {
+          print('Selected contact has no phone number.');
+        }
+      } else {
+        // Send SMS to the emergency number if no contact is selected
         SmsStatus status = await BackgroundSms.sendMessage(
-          phoneNumber: phoneNumber,
+          phoneNumber: emergencyNumber,
           message: 'I am in trouble. $locationMessage',
         );
         if (status == SmsStatus.sent) {
-          print('SOS message sent to $phoneNumber');
+          print('SOS message sent to emergency number: $emergencyNumber');
         } else {
-          print('Failed to send SOS message to $phoneNumber');
+          print('Failed to send SOS message to emergency number: $emergencyNumber');
         }
-      } else {
-        print('Selected contact has no phone number.');
       }
-    }
 
-    await FlutterPhoneDirectCaller.callNumber(emergencyNumber);
-    print('SOS Triggered!');
+      // Call emergency number
+      await FlutterPhoneDirectCaller.callNumber(emergencyNumber);
+      print('SOS Triggered!');
+    } catch (e) {
+      print('An error occurred while triggering SOS: $e');
+    }
   }
+
 
   Future<void> _handleTriggerAlert() async {
     if (_isSOSEnabled) {
