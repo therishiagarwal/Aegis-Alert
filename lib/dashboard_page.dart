@@ -27,10 +27,26 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
+
+    _requestAllPermissions();
+
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: _handleShake,
       shakeThresholdGravity: 8,
     );
+  }
+
+  Future<void> _requestAllPermissions() async {
+    await _requestLocationPermission();
+    await _requestMicrophonePermission();
+    await _requestSOSPermission();
+  }
+
+  Future<void> _openAppSettings() async {
+    bool opened = await openAppSettings();
+    if (!opened) {
+      print('Failed to open app settings.');
+    }
   }
 
   @override
@@ -40,7 +56,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _requestLocationPermission() async {
-    PermissionStatus status = await Permission.location.request();
+    PermissionStatus status = await Permission.locationAlways.request();
     if (status.isGranted) {
       setState(() {
         _isLocationEnabled = true;
@@ -49,6 +65,7 @@ class _DashboardPageState extends State<DashboardPage> {
       setState(() {
         _isLocationEnabled = false;
       });
+      _showPermissionDeniedDialog();
     }
   }
 
@@ -87,16 +104,20 @@ class _DashboardPageState extends State<DashboardPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Permission Required'),
-        content: const Text('To enable SOS, all required permissions (Phone, Location, SMS) must be granted.'),
+        content: const Text('You need to grant location always and other permissions for full functionality.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              Navigator.of(context).pop();
+              _openAppSettings();  // Open app settings when "OK" is clicked
+            },
             child: const Text('OK'),
           ),
         ],
       ),
     );
   }
+
 
   void _handleShake() {
     if (_isSOSEnabled) {
